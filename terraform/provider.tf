@@ -1,3 +1,3 @@
 provider "aws" {
-  region = "us-west-2" # Default AWS provider
+  region = "us-west-1" # Default AWS provider
 }

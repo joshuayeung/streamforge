@@ -5,3 +5,4 @@ output "mwaa_environment_arn" {
 output "msk_cluster_arn" {
   value = module.msk.cluster_arn # Use the output from the MSK module
 }
+
