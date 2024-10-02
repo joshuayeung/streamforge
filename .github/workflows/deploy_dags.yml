@@ -1,0 +1,29 @@
+name: Deploy Airflow DAGs to MWAA
+
+on:
+  push:
+    branches:
+      - main  # Change this to the branch that triggers deployment, e.g., 'main'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Set up AWS CLI
+      uses: aws-actions/configure-aws-credentials@v2
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ secrets.AWS_REGION }}
+
+    - name: Sync DAGs to S3
+      run: |
+        aws s3 sync ./dags s3://$S3_BUCKET_NAME/dags --region $AWS_REGION
+
+    - name: Update MWAA Environment
+      run: |
+        aws mwaa update-environment --name $MWAA_ENV_NAME --region $AWS_REGION --dag-s3-path "dags/"
