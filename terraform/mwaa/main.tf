@@ -22,25 +22,6 @@ resource "aws_s3_bucket" "mwaa_dag_bucket" {
   bucket = "streamforge-mwaa-dag-bucket-${random_string.random.result}"
 }
 
-resource "aws_iam_role" "mwaa_execution_role" {
-  name = "MWAAExecutionRole-${random_string.random.result}"
-
-  assume_role_policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Effect = "Allow"
-        Principal = {
-          Service = "airflow-env.amazonaws.com"  # Ensure MWAA can assume this role
-        }
-        Action = "sts:AssumeRole"
-      }
-    ]
-  })
-
-  # Add any additional policies or managed policies here
-}
-
 resource "aws_security_group" "mwaa_sg" {
   vpc_id = var.vpc_id
 
