@@ -1,6 +1,12 @@
+resource "random_string" "random" {
+  length           = 16
+  special          = false
+  upper            = false
+}
+
 resource "aws_msk_cluster" "kafka_cluster" {
-  cluster_name           = "streamforge-msk-cluster"
-  kafka_version          = "2.8.1"
+  cluster_name           = "streamforge-msk-cluster-${random_string.random.result}"
+  kafka_version          = "3.5.1"
   number_of_broker_nodes = 2
 
   broker_node_group_info {
