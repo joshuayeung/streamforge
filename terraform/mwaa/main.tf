@@ -23,7 +23,7 @@ resource "aws_s3_bucket" "mwaa_dag_bucket" {
 }
 
 resource "aws_iam_role" "mwaa_execution_role" {
-  name = "MWAAExecutionRole-${var.environment_name}"
+  name = "MWAAExecutionRole-${random_string.random.result}"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
