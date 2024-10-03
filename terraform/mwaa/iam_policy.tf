@@ -91,3 +91,192 @@ resource "aws_iam_role_policy" "mwaa_execution_policy" {
     ]
   })
 }
+
+# Create separate policies for each role
+
+# Admin Policy
+resource "aws_iam_policy" "mwaa_admin_policy" {
+  name        = "MWAAAdminPolicy"
+  description = "Policy to allow Admin access to the Apache Airflow Web UI"
+
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Effect   = "Allow",
+        Action   = "airflow:CreateWebLoginToken",
+        Resource = "arn:aws:airflow:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:role/MWAAExecutionPolicy-streamforge-mwaa-env-${random_string.random.result}/Admin"
+      }
+    ]
+  })
+}
+
+# Op Policy
+resource "aws_iam_policy" "mwaa_op_policy" {
+  name        = "MWAAOpPolicy"
+  description = "Policy to allow Op access to the Apache Airflow Web UI"
+
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Effect   = "Allow",
+        Action   = "airflow:CreateWebLoginToken",
+        Resource = "arn:aws:airflow:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:role/MWAAExecutionPolicy-streamforge-mwaa-env-${random_string.random.result}/Op"
+      }
+    ]
+  })
+}
+
+# User Policy
+resource "aws_iam_policy" "mwaa_user_policy" {
+  name        = "MWAAUserPolicy"
+  description = "Policy to allow User access to the Apache Airflow Web UI"
+
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Effect   = "Allow",
+        Action   = "airflow:CreateWebLoginToken",
+        Resource = "arn:aws:airflow:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:role/MWAAExecutionPolicy-streamforge-mwaa-env-${random_string.random.result}/User"
+      }
+    ]
+  })
+}
+
+# Viewer Policy
+resource "aws_iam_policy" "mwaa_viewer_policy" {
+  name        = "MWAAViewerPolicy"
+  description = "Policy to allow Viewer access to the Apache Airflow Web UI"
+
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Effect   = "Allow",
+        Action   = "airflow:CreateWebLoginToken",
+        Resource = "arn:aws:airflow:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:role/MWAAExecutionPolicy-streamforge-mwaa-env-${random_string.random.result}/Viewer"
+      }
+    ]
+  })
+}
+
+# Public Policy
+resource "aws_iam_policy" "mwaa_public_policy" {
+  name        = "MWAAPublicPolicy"
+  description = "Policy to allow Public access to the Apache Airflow Web UI"
+
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Effect   = "Allow",
+        Action   = "airflow:CreateWebLoginToken",
+        Resource = "arn:aws:airflow:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:role/MWAAExecutionPolicy-streamforge-mwaa-env-${random_string.random.result}/Public"
+      }
+    ]
+  })
+}
+
+# Create separate IAM roles and attach the appropriate policies for each role
+
+# Admin Role
+resource "aws_iam_role" "mwaa_admin_role" {
+  name = "AdminRole"
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [{
+      Effect = "Allow",
+      Principal = {
+        Service = "airflow.amazonaws.com"
+      },
+      Action = "sts:AssumeRole"
+    }]
+  })
+
+  inline_policy {
+    name   = "MWAAAdminPolicy"
+    policy = aws_iam_policy.mwaa_admin_policy.policy
+  }
+}
+
+# Op Role
+resource "aws_iam_role" "mwaa_op_role" {
+  name = "OpRole"
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [{
+      Effect = "Allow",
+      Principal = {
+        Service = "airflow.amazonaws.com"
+      },
+      Action = "sts:AssumeRole"
+    }]
+  })
+
+  inline_policy {
+    name   = "MWAAOpPolicy"
+    policy = aws_iam_policy.mwaa_op_policy.policy
+  }
+}
+
+# User Role
+resource "aws_iam_role" "mwaa_user_role" {
+  name = "UserRole"
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [{
+      Effect = "Allow",
+      Principal = {
+        Service = "airflow.amazonaws.com"
+      },
+      Action = "sts:AssumeRole"
+    }]
+  })
+
+  inline_policy {
+    name   = "MWAAUserPolicy"
+    policy = aws_iam_policy.mwaa_user_policy.policy
+  }
+}
+
+# Viewer Role
+resource "aws_iam_role" "mwaa_viewer_role" {
+  name = "ViewerRole"
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [{
+      Effect = "Allow",
+      Principal = {
+        Service = "airflow.amazonaws.com"
+      },
+      Action = "sts:AssumeRole"
+    }]
+  })
+
+  inline_policy {
+    name   = "MWAAViewerPolicy"
+    policy = aws_iam_policy.mwaa_viewer_policy.policy
+  }
+}
+
+# Public Role
+resource "aws_iam_role" "mwaa_public_role" {
+  name = "PublicRole"
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [{
+      Effect = "Allow",
+      Principal = {
+        Service = "airflow.amazonaws.com"
+      },
+      Action = "sts:AssumeRole"
+    }]
+  })
+
+  inline_policy {
+    name   = "MWAAPublicPolicy"
+    policy = aws_iam_policy.mwaa_public_policy.policy
+  }
+}
