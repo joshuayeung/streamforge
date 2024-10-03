@@ -7,16 +7,6 @@ on:
       - fix/aws-s3-sync-action
 
 jobs:
-  greeting_job:
-    runs-on: ubuntu-latest
-    steps:
-      - name: "AWS_REGION"
-        run: echo "$AWS_REGION"
-      - name: "MWAA_ENV_NAME"
-        run: echo "$MWAA_ENV_NAME"
-      - name: "S3_BUCKET_NAME"
-        run: echo "$S3_BUCKET_NAME"
-
   deploy:
     runs-on: ubuntu-latest
 
