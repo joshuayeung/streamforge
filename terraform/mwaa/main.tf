@@ -1,3 +1,6 @@
+data "aws_caller_identity" "current" {}
+data "aws_region" "current" {}
+
 resource "aws_mwaa_environment" "airflow" {
   name = "streamforge-mwaa-env-${random_string.random.result}"
 
@@ -20,25 +23,6 @@ resource "random_string" "random" {
 
 resource "aws_s3_bucket" "mwaa_dag_bucket" {
   bucket = "streamforge-mwaa-dag-bucket-${random_string.random.result}"
-}
-
-resource "aws_iam_role" "mwaa_execution_role" {
-  name = "MWAAExecutionRole-${random_string.random.result}"
-
-  assume_role_policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Effect = "Allow"
-        Principal = {
-          Service = "airflow-env.amazonaws.com"  # Ensure MWAA can assume this role
-        }
-        Action = "sts:AssumeRole"
-      }
-    ]
-  })
-
-  # Add any additional policies or managed policies here
 }
 
 resource "aws_security_group" "mwaa_sg" {
