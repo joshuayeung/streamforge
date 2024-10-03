@@ -11,19 +11,13 @@ resource "aws_iam_role_policy" "mwaa_execution_policy" {
         Resource = "arn:aws:airflow:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:environment/${aws_mwaa_environment.airflow.name}"
       },
       {
-        Effect = "Deny",
-        Action = "s3:ListAllMyBuckets",
-        Resource = [
-          "${aws_s3_bucket.mwaa_dag_bucket.arn}",
-          "${aws_s3_bucket.mwaa_dag_bucket.arn}/*"
-        ]
-      },
-      {
-        Effect = "Allow",
+        Effect = "Allow",  # Ensure MWAA can list and read objects in the S3 bucket
         Action = [
-          "s3:GetObject*",
-          "s3:GetBucket*",
-          "s3:List*"
+          "s3:GetObject",
+          "s3:ListBucket",
+          "s3:ListBucketVersions",
+          "s3:GetBucketLocation",
+          "s3:GetBucketPolicy"
         ],
         Resource = [
           "${aws_s3_bucket.mwaa_dag_bucket.arn}",
@@ -31,7 +25,7 @@ resource "aws_iam_role_policy" "mwaa_execution_policy" {
         ]
       },
       {
-        Effect = "Allow",
+        Effect = "Allow",  # Ensure MWAA can write logs to CloudWatch
         Action = [
           "logs:CreateLogStream",
           "logs:CreateLogGroup",
@@ -44,17 +38,12 @@ resource "aws_iam_role_policy" "mwaa_execution_policy" {
         Resource = "arn:aws:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:log-group:airflow-${aws_mwaa_environment.airflow.name}-*"
       },
       {
-        Effect = "Allow",
-        Action = "logs:DescribeLogGroups",
-        Resource = "*"
-      },
-      {
-        Effect = "Allow",
+        Effect = "Allow",  # CloudWatch Metrics permission
         Action = "cloudwatch:PutMetricData",
         Resource = "*"
       },
       {
-        Effect = "Allow",
+        Effect = "Allow",  # SQS permissions for Celery task queues
         Action = [
           "sqs:ChangeMessageVisibility",
           "sqs:DeleteMessage",
@@ -66,7 +55,7 @@ resource "aws_iam_role_policy" "mwaa_execution_policy" {
         Resource = "arn:aws:sqs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:airflow-celery-*"
       },
       {
-        Effect = "Allow",
+        Effect = "Allow",  # KMS permissions for encryption
         Action = [
           "kms:Decrypt",
           "kms:DescribeKey",
