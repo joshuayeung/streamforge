@@ -17,7 +17,8 @@ resource "aws_iam_role_policy" "mwaa_execution_policy" {
           "s3:ListBucket",
           "s3:ListBucketVersions",
           "s3:GetBucketLocation",
-          "s3:GetBucketPolicy"
+          "s3:GetBucketPolicy",
+          "s3:GetAccountPublicAccessBlock"
         ],
         Resource = [
           "${aws_s3_bucket.mwaa_dag_bucket.arn}",
