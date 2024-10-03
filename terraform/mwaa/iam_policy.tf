@@ -13,7 +13,9 @@ resource "aws_iam_role_policy" "mwaa_execution_policy" {
       {
         Effect = "Allow",  # Ensure MWAA can list and read objects in the S3 bucket
         Action = [
-          "s3:GetObject",
+          "s3:GetObject*",
+          "s3:GetBucket*",
+          "s3:List*",
           "s3:ListBucket",
           "s3:ListBucketVersions",
           "s3:GetBucketLocation",
