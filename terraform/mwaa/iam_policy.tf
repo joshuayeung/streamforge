@@ -1,5 +1,5 @@
 resource "aws_iam_role_policy" "mwaa_execution_policy" {
-  name   = "MWAAExecutionPolicy-${aws_mwaa_environment.airflow.name}"
+  name   = "MWAAExecutionPolicy-streamforge-mwaa-env-${random_string.random.result}"
   role   = aws_iam_role.mwaa_execution_role.id
 
   policy = jsonencode({
@@ -8,7 +8,7 @@ resource "aws_iam_role_policy" "mwaa_execution_policy" {
       {
         Effect = "Allow",
         Action = "airflow:PublishMetrics",
-        Resource = "arn:aws:airflow:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:environment/${aws_mwaa_environment.airflow.name}"
+        Resource = "arn:aws:airflow:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:environment/streamforge-mwaa-env-${random_string.random.result}"
       },
       {
         Effect = "Allow",  # Ensure MWAA can list and read objects in the S3 bucket
@@ -35,7 +35,7 @@ resource "aws_iam_role_policy" "mwaa_execution_policy" {
           "logs:GetLogGroupFields",
           "logs:GetQueryResults"
         ],
-        Resource = "arn:aws:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:log-group:airflow-${aws_mwaa_environment.airflow.name}-*"
+        Resource = "arn:aws:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:log-group:airflow-streamforge-mwaa-env-${random_string.random.result}-*"
       },
       {
         Effect = "Allow",  # CloudWatch Metrics permission

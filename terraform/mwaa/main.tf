@@ -1,6 +1,7 @@
 data "aws_caller_identity" "current" {}
 data "aws_region" "current" {}
 
+
 resource "aws_mwaa_environment" "airflow" {
   name = "streamforge-mwaa-env-${random_string.random.result}"
 
@@ -13,6 +14,10 @@ resource "aws_mwaa_environment" "airflow" {
     subnet_ids         = var.private_subnet_ids
   }
   environment_class = "mw1.small"
+  depends_on = [
+    aws_iam_role.mwaa_execution_role,      # Ensure the IAM role is created first
+    aws_iam_role_policy.mwaa_execution_policy  # Ensure IAM role policy is created first
+  ]
 }
 
 resource "random_string" "random" {
