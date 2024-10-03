@@ -1,3 +1,6 @@
+data "aws_caller_identity" "current" {}
+data "aws_region" "current" {}
+
 resource "aws_mwaa_environment" "airflow" {
   name = "streamforge-mwaa-env-${random_string.random.result}"
 

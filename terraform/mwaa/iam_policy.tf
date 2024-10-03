@@ -8,7 +8,7 @@ resource "aws_iam_role_policy" "mwaa_execution_policy" {
       {
         Effect = "Allow",
         Action = "airflow:PublishMetrics",
-        Resource = "arn:aws:airflow:${var.region}:${data.aws_caller_identity.current.account_id}:environment/${aws_mwaa_environment.airflow.name}"
+        Resource = "arn:aws:airflow:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:environment/${aws_mwaa_environment.airflow.name}"
       },
       {
         Effect = "Deny",
@@ -41,7 +41,7 @@ resource "aws_iam_role_policy" "mwaa_execution_policy" {
           "logs:GetLogGroupFields",
           "logs:GetQueryResults"
         ],
-        Resource = "arn:aws:logs:${var.region}:${var.aws_account_id}:log-group:airflow-${aws_mwaa_environment.airflow.name}-*"
+        Resource = "arn:aws:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:log-group:airflow-${aws_mwaa_environment.airflow.name}-*"
       },
       {
         Effect = "Allow",
@@ -63,7 +63,7 @@ resource "aws_iam_role_policy" "mwaa_execution_policy" {
           "sqs:ReceiveMessage",
           "sqs:SendMessage"
         ],
-        Resource = "arn:aws:sqs:${var.region}:${var.aws_account_id}:airflow-celery-*"
+        Resource = "arn:aws:sqs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:airflow-celery-*"
       },
       {
         Effect = "Allow",
@@ -73,11 +73,11 @@ resource "aws_iam_role_policy" "mwaa_execution_policy" {
           "kms:GenerateDataKey*",
           "kms:Encrypt"
         ],
-        NotResource = "arn:aws:kms:${var.region}:${var.aws_account_id}:key/*",
+        NotResource = "arn:aws:kms:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:key/*",
         Condition = {
           StringLike = {
             "kms:ViaService" = [
-              "sqs.${var.region}.amazonaws.com"
+              "sqs.${data.aws_region.current.name}.amazonaws.com"
             ]
           }
         }
