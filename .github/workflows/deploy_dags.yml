@@ -28,7 +28,7 @@ jobs:
     - name: Wait for MWAA environment to be ready
       run: |
         while true; do
-          status=$(aws mwaa get-environment --name ${{ vars.MWAA_ENV_NAME }} --region ${{ vars.AWS_REGION }} --query 'Status' --output text)
+          status=$(aws mwaa get-environment --name ${{ vars.MWAA_ENV_NAME }} --region ${{ vars.AWS_REGION }} --query 'Environment.Status' --output text)
           echo "Current status: $status"
           if [[ "$status" != "UPDATING" ]]; then
             break
