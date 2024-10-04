@@ -38,6 +38,21 @@ jobs:
           pip install -r kafka/src/twitter_producer/requirements.txt
           pip install -r kafka/src/reddit_producer/requirements.txt
 
+      # Check if stack is in ROLLBACK_COMPLETE state
+      - name: Check for ROLLBACK_COMPLETE state
+        id: check_rollback
+        run: |
+          set -e
+          STACK_STATUS=$(aws cloudformation describe-stacks --stack-name streamforge-sam --query "Stacks[0].StackStatus" --output text)
+          echo "Stack status is: $STACK_STATUS"
+          if [ "$STACK_STATUS" == "ROLLBACK_COMPLETE" ]; then
+            echo "Stack is in ROLLBACK_COMPLETE, deleting the stack."
+            aws cloudformation delete-stack --stack-name streamforge-sam
+            aws cloudformation wait stack-delete-complete --stack-name streamforge-sam
+          else
+            echo "Stack is not in ROLLBACK_COMPLETE state, continuing."
+          fi
+
       - name: Build SAM Application
         run: |
           cd kafka
