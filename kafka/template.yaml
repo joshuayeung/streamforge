@@ -1,0 +1,84 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  AWS SAM template for streaming data from Twitter and Reddit to Kafka (MSK).
+
+Globals:
+  Function:
+    Timeout: 120  # Adjust timeout based on how frequently data is ingested
+
+Resources:
+  TwitterProducerFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: app.lambda_handler
+      Runtime: python3.12
+      CodeUri: src/twitter_producer/
+      Environment:
+        Variables:
+          TWITTER_API_SECRET_ARN: !Ref TwitterAPISecret  # Secret ARN for Twitter API keys
+          KAFKA_SECRET_ARN: !Ref KafkaSecret  # Secret ARN for Kafka bootstrap servers
+      Policies:
+        - SecretsManagerReadWrite  # Access to Secrets Manager
+        - AWSLambdaVPCAccessExecutionRole  # VPC access for MSK
+      VpcConfig:
+        SecurityGroupIds:
+          - !Ref LambdaSecurityGroup  # Security group for MSK access
+        SubnetIds:
+          - !Ref PrivateSubnet1
+          - !Ref PrivateSubnet2
+
+  RedditProducerFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: app.lambda_handler
+      Runtime: python3.12
+      CodeUri: src/reddit_producer/
+      Environment:
+        Variables:
+          REDDIT_API_SECRET_ARN: !Ref RedditAPISecret  # Secret ARN for Reddit API keys
+          KAFKA_SECRET_ARN: !Ref KafkaSecret  # Secret ARN for Kafka bootstrap servers
+      Policies:
+        - SecretsManagerReadWrite  # Access to Secrets Manager
+        - AWSLambdaVPCAccessExecutionRole  # VPC access for MSK
+      VpcConfig:
+        SecurityGroupIds:
+          - !Ref LambdaSecurityGroup  # Security group for MSK access
+        SubnetIds:
+          - !Ref PrivateSubnet1
+          - !Ref PrivateSubnet2
+
+  # Security group for Lambda functions to access MSK
+  LambdaSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Security group for Lambda to access MSK
+      VpcId: !Ref VpcId
+
+  # Secrets for Twitter, Reddit, and Kafka (You should create these secrets with API keys)
+  TwitterAPISecret:
+    Type: AWS::SecretsManager::Secret
+    Properties:
+      Name: TwitterAPIKeys
+      Description: Twitter API keys for the Lambda function.
+
+  RedditAPISecret:
+    Type: AWS::SecretsManager::Secret
+    Properties:
+      Name: RedditAPIKeys
+      Description: Reddit API keys for the Lambda function.
+
+  KafkaSecret:
+    Type: AWS::SecretsManager::Secret
+    Properties:
+      Name: KafkaBootstrapServers
+      Description: Kafka Bootstrap servers for the Lambda function.
+
+Outputs:
+  TwitterProducerFunction:
+    Description: Lambda Function ARN for Twitter Producer
+    Value: !GetAtt TwitterProducerFunction.Arn
+
+  RedditProducerFunction:
+    Description: Lambda Function ARN for Reddit Producer
+    Value: !GetAtt RedditProducerFunction.Arn
