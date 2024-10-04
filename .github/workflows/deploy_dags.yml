@@ -25,6 +25,20 @@ jobs:
       run: |
         aws s3 sync ./dags s3://${{ vars.S3_BUCKET_NAME }}/dags --region ${{ vars.AWS_REGION }}
 
+    - name: Wait for MWAA environment to be ready
+      run: |
+        while true; do
+          status=$(aws mwaa get-environment --name ${{ vars.MWAA_ENV_NAME }} --region ${{ vars.AWS_REGION }} --query 'Status' --output text)
+          echo "Current status: $status"
+          if [[ "$status" != "UPDATING" ]]; then
+            break
+          fi
+          echo "Waiting for MWAA environment to finish updating..."
+          sleep 30  # Wait for 30 seconds before checking again
+        done
+
     - name: Update MWAA Environment
       run: |
-        aws mwaa update-environment --name ${{ vars.MWAA_ENV_NAME }} --region ${{ vars.AWS_REGION }} --dag-s3-path "dags"
+        for i in {1..5}; do
+          aws mwaa update-environment --name ${{ vars.MWAA_ENV_NAME }} --region ${{ vars.AWS_REGION }} --dag-s3-path "dags"
+        done
