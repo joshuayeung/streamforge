@@ -7,6 +7,19 @@ Globals:
   Function:
     Timeout: 120  # Adjust timeout based on how frequently data is ingested
 
+Parameters:
+  VpcId:
+    Type: AWS::EC2::VPC::Id
+    Description: VPC ID for deploying Lambda functions and accessing MSK
+
+  PrivateSubnet1:
+    Type: AWS::EC2::Subnet::Id
+    Description: Private subnet 1 for Lambda functions
+
+  PrivateSubnet2:
+    Type: AWS::EC2::Subnet::Id
+    Description: Private subnet 2 for Lambda functions
+
 Resources:
   TwitterProducerFunction:
     Type: AWS::Serverless::Function
@@ -48,14 +61,12 @@ Resources:
           - !Ref PrivateSubnet1
           - !Ref PrivateSubnet2
 
-  # Security group for Lambda functions to access MSK
   LambdaSecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
       GroupDescription: Security group for Lambda to access MSK
       VpcId: !Ref VpcId
 
-  # Secrets for Twitter, Reddit, and Kafka (You should create these secrets with API keys)
   TwitterAPISecret:
     Type: AWS::SecretsManager::Secret
     Properties:
