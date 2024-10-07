@@ -35,8 +35,9 @@ jobs:
 
       - name: Install dependencies for Twitter and Reddit Producers
         run: |
-          pip install -r kafka/src/twitter_producer/requirements.txt
-          pip install -r kafka/src/reddit_producer/requirements.txt
+          pip install -r kafka/src/producer/twitter/requirements.txt
+          pip install -r kafka/src/producer/reddit/requirements.txt
+          pip install -r kafka/src/consumer/twitter/requirements.txt
 
       # Check if stack is in ROLLBACK_COMPLETE state
       - name: Check for ROLLBACK_COMPLETE state
