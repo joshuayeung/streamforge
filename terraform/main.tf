@@ -5,7 +5,7 @@ module "vpc" {
 }
 
 module "mwaa" {
-  source             = "./mwaa"
+  source = "./mwaa"
 }
 
 module "msk" {

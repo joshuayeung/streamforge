@@ -4,13 +4,13 @@ on:
   push:
     branches:
       - main
-      - feature/infra-changes
+      - feature/explicit-apply-terraform
   pull_request:
     branches:
       - main
 
 jobs:
-  terraform:
+  deploy:
     runs-on: ubuntu-latest
 
     steps:
@@ -20,7 +20,13 @@ jobs:
       - name: Set up Terraform
         uses: hashicorp/setup-terraform@v2
         with:
+          terraform_version: 1.9.6
           cli_config_credentials_token: ${{ secrets.TERRAFORM_CLOUD_API_TOKEN }}
+
+      - name: Set environment variables for Terraform
+        run: |
+          echo "TF_VAR_terraform_organization_name=${{ secrets.TERRAFORM_ORG }}" >> $GITHUB_ENV
+          echo "TF_VAR_terraform_workspace_name=${{ secrets.TERRAFORM_WORKSPACE }}" >> $GITHUB_ENV
 
       - name: Initialize Terraform
         run: terraform init
@@ -28,5 +34,5 @@ jobs:
       - name: Terraform Plan
         run: terraform plan
 
-      - name: Terraform Apply
-        run: terraform apply -auto-approve
+      # - name: Apply Terraform changes
+      #   run: terraform apply -auto-approve
