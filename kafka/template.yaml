@@ -4,7 +4,7 @@ Description: >
   Twitter and Reddit Producer-Consumer setup using AWS Lambda and MSK
 
 Parameters:
-  S3BucketName:
+  ResultBucketName:
     Type: String
     Description: The name of the S3 bucket for storing results.
 
@@ -66,7 +66,7 @@ Resources:
       Environment:
         Variables:
           KAFKA_SECRET_ARN: !Ref KafkaSecretArn
-          S3_BUCKET_NAME: !Ref S3BucketName
+          S3_BUCKET_NAME: !Ref ResultBucketName
 
   # Reddit Producer Lambda Function
   RedditProducerFunction:
@@ -125,7 +125,7 @@ Resources:
   S3Bucket:
     Type: AWS::S3::Bucket
     Properties:
-      BucketName: !Ref S3BucketName
+      BucketName: !Ref ResultBucketName
 
 Outputs:
   TwitterProducerLambdaArn:
