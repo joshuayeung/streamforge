@@ -99,6 +99,10 @@ This project implements two key components:
     - S3 bucket for DAGs
     - Security groups, subnets, VPC
 
+    Certainly! You can add a section in your root **README.md** that links to the Terraform-specific README file. Here’s how you might format that section:
+
+    For detailed information on how to set up and manage Terraform with Terraform Cloud as the backend, please refer to the [Terraform Setup Guide](terraform/README.md).
+
 3. **Deploy Airflow DAGs**:
     Once the infrastructure is provisioned, use the provided script to upload DAGs to the MWAA S3 bucket:
     ```bash
