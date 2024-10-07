@@ -27,3 +27,13 @@ variable "security_group_id" {
   type        = string
   default     = "sg-062dcccd7a0367fd9"
 }
+
+variable "terraform_organization_name" {
+  description = "The Terraform Cloud organization name"
+  type        = string
+}
+
+variable "terraform_workspace_name" {
+  description = "The Terraform Cloud workspace name"
+  type        = string
+}

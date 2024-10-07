@@ -1,13 +1,10 @@
 name: Deploy SAM Application
 
 on:
-  push:
-    branches:
-      - main  # Trigger on push to main branch
-      - feature/kafka-producer-consumer
-  pull_request:
-    branches:
-      - main
+  workflow_run:
+    workflows: ["Deploy Infrastructure using Terraform Cloud"]
+    types:
+      - completed
 
 jobs:
   deploy:
