@@ -29,10 +29,16 @@ jobs:
           echo "TF_VAR_terraform_workspace_name=${{ secrets.TERRAFORM_WORKSPACE }}" >> $GITHUB_ENV
 
       - name: Initialize Terraform
-        run: terraform init
+        run: |
+          cd terraform
+          terraform init
 
-      - name: Terraform Plan
-        run: terraform plan
+      - name: Plan Terraform
+        run: |
+          cd terraform
+          terraform plan
 
-      # - name: Apply Terraform changes
-      #   run: terraform apply -auto-approve
+      # - name: Apply Terraform
+      #   run: |
+      #     cd terraform
+      #     terraform apply -auto-approve
