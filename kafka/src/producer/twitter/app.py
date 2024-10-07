@@ -2,6 +2,7 @@ import os
 import json
 import boto3
 import tweepy
+import time
 from kafka import KafkaProducer
 
 secrets_client = boto3.client('secretsmanager')
@@ -34,7 +35,17 @@ def lambda_handler(event, context):
         def on_data(self, raw_data):
             tweet = json.loads(raw_data)
             producer.send('twitter_topic', tweet)
-    
+
     listener = StreamListener()
     stream = tweepy.Stream(auth=api.auth, listener=listener)
-    stream.filter(track=['AWS', 'Data'], languages=['en'])
+
+    # Limit the streaming time to 100 seconds to avoid Lambda timeout
+    start_time = time.time()
+    try:
+        stream.filter(track=['AWS', 'Data'], languages=['en'], is_async=True)
+
+        # Stop streaming after 100 seconds to ensure completion within Lambda's 120-second timeout
+        while time.time() - start_time < 100:
+            time.sleep(1)
+    finally:
+        stream.disconnect()

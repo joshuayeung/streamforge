@@ -1,0 +1,5 @@
+boto3
+tweepy
+kafka-python==2.0.2
+six==1.16.0
+praw
