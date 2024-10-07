@@ -3,6 +3,11 @@ Transform: AWS::Serverless-2016-10-31
 Description: >
   Twitter and Reddit Producer-Consumer setup using AWS Lambda and MSK
 
+Parameters:
+  S3BucketName:
+    Type: String
+    Description: The name of the S3 bucket for storing results.
+
 Resources:
   # Lambda Execution Role
   LambdaExecutionRole:
