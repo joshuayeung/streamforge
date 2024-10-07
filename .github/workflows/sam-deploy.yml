@@ -1,0 +1,76 @@
+name: Deploy SAM Application
+
+on:
+  push:
+    branches:
+      - main  # Trigger on push to main branch
+      - feature/kafka-producer-consumer
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install AWS CLI
+        run: |
+          pip install awscli aws-sam-cli
+
+      - name: Set up AWS credentials
+        uses: aws-actions/configure-aws-credentials@v3
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ vars.AWS_REGION }}
+
+      - name: Install dependencies for Twitter and Reddit Producers
+        run: |
+          pip install -r kafka/src/producer/twitter/requirements.txt
+          pip install -r kafka/src/producer/reddit/requirements.txt
+          pip install -r kafka/src/consumer/twitter/requirements.txt
+
+      # Check if stack is in ROLLBACK_COMPLETE state
+      - name: Check for ROLLBACK_COMPLETE state
+        id: check_rollback
+        run: |
+          set -e
+          STACK_STATUS=$(aws cloudformation describe-stacks --stack-name streamforge-sam --query "Stacks[0].StackStatus" --output text)
+          echo "Stack status is: $STACK_STATUS"
+          if [ "$STACK_STATUS" == "ROLLBACK_COMPLETE" ]; then
+            echo "Stack is in ROLLBACK_COMPLETE, deleting the stack."
+            aws cloudformation delete-stack --stack-name streamforge-sam
+            aws cloudformation wait stack-delete-complete --stack-name streamforge-sam
+          else
+            echo "Stack is not in ROLLBACK_COMPLETE state, continuing."
+          fi
+
+      - name: Build SAM Application
+        run: |
+          cd kafka
+          sam build
+
+      - name: Deploy SAM Application
+        run: |
+          cd kafka
+          sam deploy --no-confirm-changeset --no-fail-on-empty-changeset --stack-name streamforge-sam \
+            --s3-bucket ${{ secrets.S3_BUCKET_NAME }} \
+            --parameter-overrides \
+              VpcId=${{ secrets.VPC_ID }} \
+              PrivateSubnet1=${{ secrets.PRIVATE_SUBNET_1 }} \
+              PrivateSubnet2=${{ secrets.PRIVATE_SUBNET_2 }} \
+              ResultBucketName=${{ secrets.S3_BUCKET_NAME }} \
+            --capabilities CAPABILITY_IAM CAPABILITY_NAMED_IAM CAPABILITY_AUTO_EXPAND
+
+      - name: Verify Deployment
+        run: |
+          aws cloudformation describe-stacks --stack-name streamforge-sam

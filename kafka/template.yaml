@@ -1,0 +1,141 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  Twitter and Reddit Producer-Consumer setup using AWS Lambda and MSK
+
+Parameters:
+  ResultBucketName:
+    Type: String
+    Description: The name of the S3 bucket for storing results.
+
+Resources:
+  # Lambda Execution Role
+  LambdaExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: AccessMSKAndSecrets
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - msk:DescribeCluster
+                  - msk:GetBootstrapBrokers
+                  - secretsmanager:GetSecretValue
+                  - logs:CreateLogGroup
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                Resource: '*'
+
+  # Twitter Producer Lambda Function
+  TwitterProducerFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: src/producer/twitter/app.lambda_handler
+      Runtime: python3.11
+      MemorySize: 512
+      Timeout: 120
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Environment:
+        Variables:
+          KAFKA_SECRET_ARN: !Ref KafkaSecretArn
+          TWITTER_API_SECRET_ARN: !Ref TwitterApiSecretArn
+      Events:
+        ProduceTweetsEvent:
+          Type: Schedule
+          Properties:
+            Schedule: rate(5 minutes) # Schedule for regular tweet production
+
+  # Twitter Consumer Lambda Function
+  TwitterConsumerFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: src/consumer/twitter/app.lambda_handler
+      Runtime: python3.11
+      MemorySize: 512
+      Timeout: 120
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Environment:
+        Variables:
+          KAFKA_SECRET_ARN: !Ref KafkaSecretArn
+          S3_BUCKET_NAME: !Ref ResultBucketName
+
+  # Reddit Producer Lambda Function
+  RedditProducerFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: src/producer/reddit/app.lambda_handler
+      Runtime: python3.11
+      MemorySize: 512
+      Timeout: 120
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Environment:
+        Variables:
+          KAFKA_SECRET_ARN: !Ref KafkaSecretArn
+          REDDIT_API_SECRET_ARN: !Ref RedditApiSecretArn
+      Events:
+        ProduceRedditEvent:
+          Type: Schedule
+          Properties:
+            Schedule: rate(10 minutes) # Schedule for regular Reddit post production
+
+  # Kafka Secrets in AWS Secrets Manager
+  KafkaSecretArn:
+    Type: AWS::SecretsManager::Secret
+    Properties:
+      Name: kafka/secrets
+      Description: Secret holding Kafka bootstrap servers and credentials
+      GenerateSecretString:
+        SecretStringTemplate: '{"bootstrap_servers": ""}'
+        GenerateStringKey: "password"
+        PasswordLength: 30
+        ExcludeCharacters: '"@/' # Customize exclusions
+
+  TwitterApiSecretArn:
+    Type: AWS::SecretsManager::Secret
+    Properties:
+      Name: twitter/api/secrets
+      Description: Secret holding Twitter API credentials
+      GenerateSecretString:
+        SecretStringTemplate: '{"api_key": "", "api_secret": "", "access_token": "", "access_token_secret": ""}'
+        GenerateStringKey: "password"
+        PasswordLength: 30
+        ExcludeCharacters: '"@/' # Customize exclusions
+
+  RedditApiSecretArn:
+    Type: AWS::SecretsManager::Secret
+    Properties:
+      Name: reddit/api/secrets
+      Description: Secret holding Reddit API credentials
+      GenerateSecretString:
+        SecretStringTemplate: '{"client_id": "", "client_secret": "", "access_token": ""}'
+        GenerateStringKey: "password"
+        PasswordLength: 30
+        ExcludeCharacters: '"@/' # Customize exclusions
+
+  # S3 Bucket for Consumer Data Storage
+  S3Bucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Ref ResultBucketName
+
+Outputs:
+  TwitterProducerLambdaArn:
+    Description: Twitter Producer Lambda ARN
+    Value: !GetAtt TwitterProducerFunction.Arn
+
+  TwitterConsumerLambdaArn:
+    Description: Twitter Consumer Lambda ARN
+    Value: !GetAtt TwitterConsumerFunction.Arn
+
+  RedditProducerLambdaArn:
+    Description: Reddit Producer Lambda ARN
+    Value: !GetAtt RedditProducerFunction.Arn

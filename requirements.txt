@@ -2,5 +2,8 @@ apache-airflow==2.10.2
 apache-airflow-providers-amazon==8.29.0  # For AWS (MWAA) integration
 boto3==1.35.25 # AWS SDK for Python
 requests==2.32.3  # For API requests (OpenWeatherMap, World Bank, etc.)
-
+boto3
+kafka-python
+tweepy
+praw
 # Add any additional packages specific to your use case
