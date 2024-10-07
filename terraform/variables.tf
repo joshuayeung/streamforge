@@ -1,3 +1,15 @@
+variable "name" {
+  description = "Name of MWAA Environment"
+  default     = "streamforge"
+  type        = string
+}
+
+variable "region" {
+  description = "region"
+  type        = string
+  default     = "us-west-1"
+}
+
 variable "vpc_id" {
   description = "VPC ID for MSK and MWAA setup"
   type        = string

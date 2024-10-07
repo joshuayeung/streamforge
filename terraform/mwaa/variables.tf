@@ -1,9 +1,23 @@
-variable "vpc_id" {
-  description = "VPC ID for the MWAA"
+variable "name" {
+  description = "Name of MWAA Environment"
+  default     = "basic-mwaa"
   type        = string
 }
 
-variable "private_subnet_ids" {
-  description = "List of private subnet IDs for the MWAA"
-  type        = list(string)
+variable "region" {
+  description = "region"
+  type        = string
+  default     = "us-west-1"
+}
+
+variable "tags" {
+  description = "Default tags"
+  default     = {}
+  type        = map(string)
+}
+
+variable "vpc_cidr" {
+  description = "VPC CIDR for MWAA"
+  type        = string
+  default     = "10.1.0.0/16"
 }

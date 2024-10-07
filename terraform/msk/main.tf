@@ -14,17 +14,17 @@ resource "aws_internet_gateway" "msk_igw" {
 }
 
 resource "aws_subnet" "public_subnet_a" {
-  vpc_id     = aws_vpc.msk_vpc.id
-  cidr_block = "10.0.1.0/24"
+  vpc_id                  = aws_vpc.msk_vpc.id
+  cidr_block              = "10.0.1.0/24"
   map_public_ip_on_launch = true
-  availability_zone = "us-west-1a"
+  availability_zone       = "us-west-1a"
 }
 
 resource "aws_subnet" "public_subnet_b" {
-  vpc_id     = aws_vpc.msk_vpc.id
-  cidr_block = "10.0.2.0/24"
+  vpc_id                  = aws_vpc.msk_vpc.id
+  cidr_block              = "10.0.2.0/24"
   map_public_ip_on_launch = true
-  availability_zone = "us-west-1b"
+  availability_zone       = "us-west-1b"
 }
 
 resource "aws_route_table" "public_rt" {
@@ -78,7 +78,7 @@ resource "aws_security_group" "msk_security_group" {
 
 resource "aws_msk_cluster" "kafka_cluster" {
   cluster_name           = "streamforge-msk-cluster-${random_string.random.result}"
-  kafka_version          = "3.5.1"
+  kafka_version          = "3.7.x.kraft"
   number_of_broker_nodes = 2
 
   broker_node_group_info {
@@ -87,7 +87,7 @@ resource "aws_msk_cluster" "kafka_cluster" {
     security_groups = [aws_security_group.msk_security_group.id]
   }
 
-   encryption_info {
+  encryption_info {
     encryption_in_transit {
       client_broker = "PLAINTEXT" # No encryption for public accessibility
       in_cluster    = true
