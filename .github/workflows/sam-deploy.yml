@@ -39,8 +39,24 @@ jobs:
           pip install -r kafka/src/producer/reddit/requirements.txt
           pip install -r kafka/src/consumer/twitter/requirements.txt
 
+      # Check if stack exists
+      - name: Check if CloudFormation stack exists
+        id: stack_exists
+        run: |
+          set +e
+          aws cloudformation describe-stacks --stack-name streamforge-sam
+          if [ $? -eq 0 ]; then
+            echo "Stack exists."
+            echo "stack_exists=true" >> $GITHUB_ENV
+          else
+            echo "Stack does not exist."
+            echo "stack_exists=false" >> $GITHUB_ENV
+          fi
+          set -e
+          
       # Check if stack is in ROLLBACK_COMPLETE state
       - name: Check for ROLLBACK_COMPLETE state
+        if: env.stack_exists == 'true'
         id: check_rollback
         run: |
           set -e
