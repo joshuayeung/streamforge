@@ -82,7 +82,7 @@ resource "aws_msk_cluster" "kafka_cluster" {
   number_of_broker_nodes = 2
 
   broker_node_group_info {
-    instance_type   = "kafka.t3.small"
+    instance_type   = "kafka.m5.large"
     client_subnets  = [aws_subnet.public_subnet_a.id, aws_subnet.public_subnet_b.id]
     security_groups = [aws_security_group.msk_security_group.id]
   }
