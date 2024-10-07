@@ -31,8 +31,10 @@ jobs:
       - name: Initialize Terraform
         run: |
           cd terraform
-          terraform init
-
+          terraform init \
+            -backend-config="organization=${{ secrets.TERRAFORM_ORG }}" \
+            -backend-config="workspaces.name=${{ secrets.TERRAFORM_WORKSPACE }}"
+  
       - name: Plan Terraform
         run: |
           cd terraform
