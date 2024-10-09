@@ -3,7 +3,7 @@ from airflow import DAG
 from airflow.operators.python import PythonOperator
 from airflow.models import Variable
 import requests
-import boto3
+
 import json
 from datetime import datetime
 
@@ -22,7 +22,7 @@ dag = DAG(
     'weather_data_to_s3',
     default_args=default_args,
     description='Fetch weather data and store it in S3',
-    schedule='@daily',  # Updated to use `schedule` instead of `schedule_interval`
+    schedule='@daily',
 )
 
 # Function to fetch weather data

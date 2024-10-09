@@ -7,3 +7,4 @@ kafka-python
 tweepy
 praw
 # Add any additional packages specific to your use case
+pandas
