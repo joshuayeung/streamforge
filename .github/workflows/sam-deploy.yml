@@ -2,7 +2,7 @@ name: Deploy SAM Application
 
 on:
   workflow_run:
-    workflows: ["Terraform Plan"]
+    workflows: ["Terraform Apply"]
     types:
       - completed
 
