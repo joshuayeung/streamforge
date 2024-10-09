@@ -2,7 +2,7 @@ name: Deploy Airflow DAGs to MWAA
 
 on:
   workflow_run:
-    workflows: ["Deploy Infrastructure using Terraform Cloud"]
+    workflows: ["Terraform Plan"]
     types:
       - completed
 

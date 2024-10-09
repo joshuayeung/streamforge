@@ -2,7 +2,7 @@ name: Deploy SAM Application
 
 on:
   workflow_run:
-    workflows: ["Deploy Infrastructure using Terraform Cloud"]
+    workflows: ["Terraform Plan"]
     types:
       - completed
 
