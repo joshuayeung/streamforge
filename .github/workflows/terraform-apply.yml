@@ -72,4 +72,4 @@ jobs:
           gh secret set S3_BUCKET_NAME --body "$S3_BUCKET_NAME"
           gh secret set VPC_ID --body "$VPC_ID"
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.PAT_FOR_SECRETS }}
