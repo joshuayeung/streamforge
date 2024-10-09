@@ -1,10 +1,10 @@
 name: Deploy Airflow DAGs to MWAA
 
 on:
-  push:
-    branches:
-      - main
-      - fix/aws-s3-sync-action
+  workflow_run:
+    workflows: ["Terraform Apply"]
+    types:
+      - completed
 
 jobs:
   deploy:
@@ -12,7 +12,7 @@ jobs:
 
     steps:
     - name: Checkout repository
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
 
     - name: Set up AWS CLI
       uses: aws-actions/configure-aws-credentials@v2
