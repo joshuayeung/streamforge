@@ -9,12 +9,15 @@ env:
   TF_CLOUD_ORGANIZATION: "${{ secrets.TERRAFORM_ORG }}"
   TF_API_TOKEN: "${{ secrets.TERRAFORM_CLOUD_API_TOKEN }}"
   TF_WORKSPACE: "${{ secrets.TERRAFORM_WORKSPACE }}"
-  CONFIG_DIRECTORY: "./terraform"
+  CONFIG_DIRECTORY: "./"
 
 jobs:
   terraform:
     name: "Terraform Plan"
     runs-on: ubuntu-latest
+    defaults:
+        run:
+          working-directory: ./terraform
     permissions:
       contents: read
       pull-requests: write
