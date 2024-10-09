@@ -1,16 +1,3 @@
-## **Kafka Producers and Consumers**
-
-Kafka handles real-time event data streaming. Producers collect data from sources like Twitter or Reddit and push it to Kafka topics, while consumers read from these topics for further processing.
-
-### Architecture Overview
-- **Producers**: The Twitter and Reddit producers are set up using AWS Lambda functions, which connect to the Twitter and Reddit APIs to ingest data and publish messages to a Kafka topic.
-- **Consumers**: The Kafka consumers process the data from the topics, perform analytics (such as extracting the top 5 hashtags), and store the results in an S3 bucket for further visualization.
-- **MSK**: AWS Managed Streaming for Apache Kafka (MSK) serves as the central message broker between producers and consumers.
-- **S3**: The analytics results from the consumers are stored in an S3 bucket for further data analysis and visualization.
-Here’s an updated version of the `README.md` file that reflects the latest changes to your Kafka producers and consumers, especially the move to using AWS Lambda for producers and the data storage process in S3 for consumers.
-
----
-
 # StreamForge Kafka Producer-Consumer Application
 
 This project is designed to ingest Twitter and Reddit data using Kafka Producers and perform analytics using Kafka Consumers. The application is built using AWS Lambda, AWS Managed Streaming for Kafka (MSK), and S3 for storing analysis results.
@@ -137,9 +124,6 @@ The Twitter consumer stores the analysis results in S3 as JSON files. The data c
 
 ## **Running the Pipeline**
 
-1. **Batch Ingestion**:
-   - Visit the MWAA Web UI to trigger or monitor DAGs like `weather_dag` and `world_bank_dag`.
-   
-2. **Real-time Streaming**:
+1. **Real-time Streaming**:
    - Start the Kafka producers for Twitter and Reddit. These will send data to Kafka topics in real time.
    - Start Kafka consumers to process the streamed data.

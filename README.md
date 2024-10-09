@@ -147,7 +147,7 @@ Kafka is used for real-time event data streaming. The producers ingest data from
 - **Producers**: Kafka producers (Twitter and Reddit) ingest data from their respective APIs and publish it to Kafka topics.
 - **Consumers**: Kafka consumers process the data in real-time, performing analytics such as extracting top hashtags from tweets or trending topics from Reddit posts.
 
-Please refer to the detailed instructions provided in the [Kafka Producers and Consumers README](kafka/README.md) . 
+Please refer to the detailed instructions provided in the [StreamForge Kafka Producer-Consumer Application](kafka/README.md) . 
 
 ---
 
